@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QM Points and Fees Test Worksheet</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #eef2f7;
+    color: #2c3e50;
+    padding: 20px;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .page {
+    max-width: 980px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+    overflow: hidden;
+  }
+
+  /* Header */
+  .page-header {
+    background: linear-gradient(135deg, #1a3a6b 0%, #2563a8 100%);
+    color: #fff;
+    padding: 22px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .page-header h1 { font-size: 20px; font-weight: 700; }
+  .page-header p  { font-size: 11px; opacity: 0.75; margin-top: 3px; }
+  .hdr-actions { display: flex; gap: 8px; flex-shrink: 0; }
+  .btn-hdr {
+    background: rgba(255,255,255,0.18);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.35);
+    padding: 7px 14px; border-radius: 5px;
+    cursor: pointer; font-size: 12px; white-space: nowrap;
+  }
+  .btn-hdr:hover { background: rgba(255,255,255,0.28); }
+
+  /* Loan Details Bar */
+  .loan-bar {
+    background: #f0f4fa;
+    border-bottom: 1px solid #dde4ef;
+    padding: 12px 30px;
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 12px;
+  }
+  .loan-bar label { display: block; font-size: 10px; font-weight: 600; color: #888; text-transform: uppercase; margin-bottom: 3px; }
+  .loan-bar input { width: 100%; padding: 6px 8px; border: 1px solid #ccd; border-radius: 4px; font-size: 12px; background: #fff; }
+
+  /* Section */
+  .section { padding: 20px 30px; border-bottom: 1px solid #e4e9f0; }
+  .section-heading { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+  .step-badge {
+    background: #1a3a6b; color: #fff;
+    font-size: 11px; font-weight: 700;
+    padding: 3px 9px; border-radius: 20px; white-space: nowrap;
+  }
+  .section-heading h2 { font-size: 13px; font-weight: 700; color: #1a3a6b; text-transform: uppercase; letter-spacing: 0.4px; }
+
+  /* Input Grid */
+  .input-grid { display: grid; grid-template-columns: 1fr 180px; gap: 8px 16px; align-items: center; max-width: 580px; }
+  .input-grid label { font-size: 13px; }
+  .input-grid input[type="number"] {
+    width: 100%; padding: 7px 10px;
+    border: 1px solid #c5cdd8; border-radius: 5px;
+    font-size: 13px; text-align: right; outline: none;
+  }
+  .input-grid input[type="number"]:focus { border-color: #2563a8; box-shadow: 0 0 0 3px rgba(37,99,168,0.12); }
+  .val-display {
+    padding: 7px 10px; background: #f0f4fa;
+    border: 1px solid #d0d9e8; border-radius: 5px;
+    font-size: 13px; font-weight: 700; text-align: right; color: #1a3a6b;
+  }
+  .grid-note { grid-column: 1 / -1; font-size: 11px; color: #888; padding-top: 2px; }
+
+  /* Threshold Pill */
+  .threshold-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #e8f0fb; border: 1px solid #b4caf5;
+    border-radius: 20px; padding: 5px 14px;
+    font-size: 11.5px; color: #1a3a6b; margin-top: 12px;
+  }
+
+  /* Sub-headings */
+  .sub-heading { font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+  .sub-add { color: #16a34a; }
+  .sub-sub { color: #dc2626; }
+
+  /* Fee Table */
+  .tbl-wrap { overflow-x: auto; }
+  table.ftable { width: 100%; border-collapse: collapse; min-width: 580px; }
+  table.ftable thead tr { background: #1a3a6b; }
+  table.ftable thead th { color: #fff; font-size: 11px; font-weight: 600; text-transform: uppercase; padding: 8px 10px; text-align: left; white-space: nowrap; }
+  table.ftable tbody tr:nth-child(even) { background: #fafbfd; }
+  table.ftable tbody td { padding: 6px 8px; border-bottom: 1px solid #edf0f5; vertical-align: middle; }
+  table.ftable input[type="text"],
+  table.ftable input[type="number"] {
+    width: 100%; padding: 5px 7px;
+    border: 1px solid #d5dce8; border-radius: 4px;
+    font-size: 12px; background: #fff; outline: none;
+  }
+  table.ftable input[type="number"] { text-align: right; }
+  table.ftable input:focus { border-color: #2563a8; }
+
+  .btn-add-row { margin-top: 8px; padding: 6px 14px; border: none; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: 600; }
+  .btn-add-add { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+  .btn-add-add:hover { background: #bbf7d0; }
+  .btn-add-sub { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+  .btn-add-sub:hover { background: #fecaca; }
+
+  .btn-del {
+    width: 24px; height: 24px;
+    background: #fee2e2; color: #b91c1c;
+    border: 1px solid #fca5a5; border-radius: 4px;
+    cursor: pointer; font-size: 15px; line-height: 24px;
+    text-align: center; display: block; margin: auto;
+  }
+  .btn-del:hover { background: #fecaca; }
+
+  /* Summary Cards */
+  .summary-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-top: 4px; }
+  .sum-card { border-radius: 8px; padding: 14px 16px; border: 1px solid #e0e7ef; }
+  .sum-card .sc-label { font-size: 11px; color: #666; text-transform: uppercase; font-weight: 600; letter-spacing: 0.4px; margin-bottom: 6px; }
+  .sum-card .sc-value { font-size: 20px; font-weight: 800; color: #1a3a6b; }
+  .qm-card  { background: #f0f4fa; }
+  .all-card { background: #f0fdf4; }
+  .diff-card { background: #f5f0ff; }
+
+  /* Result */
+  .result-wrap { padding: 20px 30px; }
+  .result-box { border-radius: 8px; padding: 18px 24px; display: flex; align-items: center; gap: 16px; }
+  .waiting { background: #f8f9fb; border: 2px solid #ccc; }
+  .passing { background: #f0fdf4; border: 2px solid #4ade80; }
+  .failing { background: #fff1f2; border: 2px solid #f87171; }
+  .result-icon { font-size: 34px; flex-shrink: 0; }
+  .result-title { font-size: 18px; font-weight: 800; }
+  .result-msg   { font-size: 12.5px; color: #555; margin-top: 4px; }
+  .waiting .result-title { color: #888; }
+  .passing .result-title { color: #15803d; }
+  .failing .result-title { color: #b91c1c; }
+
+  /* Footer */
+  .page-footer { background: #f8f9fb; border-top: 1px solid #e0e7ef; padding: 12px 30px; font-size: 11px; color: #888; }
+  .page-footer strong { color: #555; }
+
+  /* Print */
+  @media print {
+    body { background: #fff; padding: 0; }
+    .page { box-shadow: none; border-radius: 0; }
+    .hdr-actions, .btn-add-row, .btn-del { display: none !important; }
+    .page-header { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  }
+
+  @media (max-width: 640px) {
+    .loan-bar { grid-template-columns: 1fr; }
+    .summary-cards { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ── Header ─────────────────────────────────── -->
+  <div class="page-header">
+    <div>
+      <h1>QM Points &amp; Fees Test Worksheet</h1>
+      <p>Qualified Mortgage Compliance — 12 CFR § 1026.43(e)(3)</p>
+    </div>
+    <div class="hdr-actions">
+      <button class="btn-hdr" onclick="resetForm()">↺ Reset</button>
+      <button class="btn-hdr" onclick="window.print()">🖨 Print</button>
+    </div>
+  </div>
+
+  <!-- ── Loan Details Bar ───────────────────────── -->
+  <div class="loan-bar">
+    <div>
+      <label>Borrower Name</label>
+      <input type="text" id="borrowerName" placeholder="Last, First">
+    </div>
+    <div>
+      <label>Loan Number</label>
+      <input type="text" id="loanNumber" placeholder="000000000">
+    </div>
+    <div>
+      <label>Date</label>
+      <input type="text" id="workDate">
+    </div>
+  </div>
+
+  <!-- ── STEP 1 ──────────────────────────────────── -->
+  <div class="section">
+    <div class="section-heading">
+      <span class="step-badge">STEP 1</span>
+      <h2>Loan Information</h2>
+    </div>
+    <div class="input-grid">
+      <label>Amount Financed:</label>
+      <input type="number" id="amtFinanced" placeholder="0.00" min="0" step="0.01" oninput="calculate()">
+
+      <label>Non-APR Financed Section 32 Points &amp; Fees:</label>
+      <input type="number" id="nonAprFees" placeholder="0.00" min="0" step="0.01" value="0" oninput="calculate()">
+
+      <label><strong>Total Loan Amount*:</strong></label>
+      <div class="val-display" id="totalLoanAmt">$0.00</div>
+
+      <p class="grid-note">*Total Loan Amount = Amount Financed minus any non-APR financed Section 32 Points and Fees</p>
+    </div>
+  </div>
+
+  <!-- ── STEP 2 ──────────────────────────────────── -->
+  <div class="section">
+    <div class="section-heading">
+      <span class="step-badge">STEP 2</span>
+      <h2>Calculate Allowable Points and Fees</h2>
+    </div>
+    <div class="input-grid">
+      <label>Total Loan Amount:</label>
+      <div class="val-display" id="tlaDisp">$0.00</div>
+
+      <label>Applicable Tier:</label>
+      <div class="val-display" id="tierDisp" style="font-size:11px;">—</div>
+
+      <label>Rate / Amount (×):</label>
+      <div class="val-display" id="rateDisp">—</div>
+
+      <label><strong>Allowable Points and Fees (=):</strong></label>
+      <div class="val-display" id="allowableDisp" style="color:#15803d;">$0.00</div>
+    </div>
+    <div class="threshold-pill" id="thresholdPill">
+      ℹ️ Enter a loan amount above to see the applicable QM tier.
+    </div>
+  </div>
+
+  <!-- ── STEP 3 ──────────────────────────────────── -->
+  <div class="section">
+    <div class="section-heading">
+      <span class="step-badge">STEP 3</span>
+      <h2>Calculate Total QM Points and Fees</h2>
+    </div>
+
+    <!-- Additions -->
+    <div style="margin-bottom:20px">
+      <div class="sub-heading sub-add">⊕ Additions (+)</div>
+      <div class="tbl-wrap">
+        <table class="ftable">
+          <thead>
+            <tr>
+              <th style="width:65px">Code</th>
+              <th>Description</th>
+              <th style="width:130px">Paid To</th>
+              <th style="width:130px">Paid By</th>
+              <th style="width:110px">Amount ($)</th>
+              <th style="width:36px"></th>
+            </tr>
+          </thead>
+          <tbody id="addBody"></tbody>
+        </table>
+      </div>
+      <button class="btn-add-row btn-add-add" onclick="addFeeRow('add')">+ Add Item</button>
+    </div>
+
+    <!-- Subtractions -->
+    <div>
+      <div class="sub-heading sub-sub">⊖ Subtractions (−)</div>
+      <div class="tbl-wrap">
+        <table class="ftable">
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th style="width:110px">Amount ($)</th>
+              <th style="width:36px"></th>
+            </tr>
+          </thead>
+          <tbody id="subBody"></tbody>
+        </table>
+      </div>
+      <button class="btn-add-row btn-add-sub" onclick="addFeeRow('sub')">+ Add Deduction</button>
+    </div>
+  </div>
+
+  <!-- ── STEP 4 ──────────────────────────────────── -->
+  <div class="section">
+    <div class="section-heading">
+      <span class="step-badge">STEP 4</span>
+      <h2>Summary</h2>
+    </div>
+    <div class="summary-cards">
+      <div class="sum-card qm-card">
+        <div class="sc-label">Total QM Points &amp; Fees</div>
+        <div class="sc-value" id="totalQMDisp">$0.00</div>
+      </div>
+      <div class="sum-card all-card">
+        <div class="sc-label">Allowable Points &amp; Fees</div>
+        <div class="sc-value" id="allowableSumDisp">$0.00</div>
+      </div>
+      <div class="sum-card diff-card">
+        <div class="sc-label" id="diffCardLabel">Difference</div>
+        <div class="sc-value" id="diffDisp">$0.00</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Result ─────────────────────────────────── -->
+  <div class="result-wrap">
+    <div class="result-box waiting" id="resultBox">
+      <div class="result-icon" id="resultIcon">📋</div>
+      <div>
+        <div class="result-title" id="resultTitle">Awaiting Input</div>
+        <div class="result-msg"  id="resultMsg">Enter loan information and fee items to begin the QM test.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Footer ─────────────────────────────────── -->
+  <div class="page-footer">
+    <strong>QM Fee Threshold Tiers</strong> (verify annually with CFPB update):
+    ≥ $137,958 → 3.000% &nbsp;|&nbsp;
+    $82,775–$137,957 → Fixed $4,138.75 &nbsp;|&nbsp;
+    $27,592–$82,774 → 5.000% &nbsp;|&nbsp;
+    $17,245–$27,591 → Fixed $1,379.60 &nbsp;|&nbsp;
+    &lt; $17,245 → 8.000%
+    <br>For informational purposes only. Consult your compliance team for regulatory guidance.
+  </div>
+
+</div><!-- /.page -->
+
+<script>
+// ── Default Row Data ─────────────────────────────────────────────────────
+const DEFAULT_ADDS = [
+  { code:'A01', desc:'DISCOUNT POINTS',               paidTo:'Lender', paidBy:'Borrower', amt:'' },
+  { code:'A02', desc:'ADMINISTRATIVE FEE',            paidTo:'Lender', paidBy:'Borrower', amt:'1045' },
+  { code:'A03', desc:'MORTGAGE BROKER COMPENSATION',  paidTo:'Broker', paidBy:'Lender',   amt:'' },
+  { code:'A04', desc:'WIRE FEE',                      paidTo:'Lender', paidBy:'Borrower', amt:'10' },
+  { code:'',    desc:'Max Prepayment Penalty Amount',  paidTo:'',       paidBy:'',         amt:'' },
+  { code:'',    desc:'Portion of payoff for prepayment penalty when refinancing with current holder', paidTo:'', paidBy:'', amt:'' },
+];
+
+const DEFAULT_SUBS = [
+  { desc:'Amount of Upfront Conventional MI Removed from Points and Fees',   amt:'' },
+  { desc:'Amount of Bona Fide Discount Points Removed from Points and Fees', amt:'' },
+];
+
+// ── Helpers ──────────────────────────────────────────────────────────────
+function fmt(n) {
+  if (isNaN(n)) n = 0;
+  const s = Math.abs(n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return (n < 0 ? '-$' : '$') + s;
+}
+function parse(v) { const n = parseFloat(v); return isNaN(n) ? 0 : n; }
+function esc(s)   { return String(s).replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ── Threshold Tiers ──────────────────────────────────────────────────────
+function getThreshold(tla) {
+  if (tla >= 137958) return { tier:'Tier 1 (≥ $137,958)',         rate:0.03, fixed:null,    rateLabel:'3.000%' };
+  if (tla >= 82775)  return { tier:'Tier 2 ($82,775 – $137,957)', rate:null, fixed:4138.75, rateLabel:'Fixed $4,138.75' };
+  if (tla >= 27592)  return { tier:'Tier 3 ($27,592 – $82,774)',  rate:0.05, fixed:null,    rateLabel:'5.000%' };
+  if (tla >= 17245)  return { tier:'Tier 4 ($17,245 – $27,591)',  rate:null, fixed:1379.60, rateLabel:'Fixed $1,379.60' };
+  return               { tier:'Tier 5 (< $17,245)',               rate:0.08, fixed:null,    rateLabel:'8.000%' };
+}
+
+// ── Add Row to Table ─────────────────────────────────────────────────────
+function addFeeRow(type, data = {}) {
+  const tbody = document.getElementById(type === 'add' ? 'addBody' : 'subBody');
+  const tr = document.createElement('tr');
+
+  if (type === 'add') {
+    tr.innerHTML = `
+      <td><input type="text"   value="${esc(data.code   ||'')}" placeholder="A0x"              oninput="calculate()" style="text-align:center;width:55px"></td>
+      <td><input type="text"   value="${esc(data.desc   ||'')}" placeholder="Description…"     oninput="calculate()" style="text-align:left"></td>
+      <td><input type="text"   value="${esc(data.paidTo ||'')}" placeholder="Lender / Broker"  oninput="calculate()"></td>
+      <td><input type="text"   value="${esc(data.paidBy ||'')}" placeholder="Borrower / Lender" oninput="calculate()"></td>
+      <td><input type="number" value="${esc(data.amt    ||'')}" placeholder="0.00" step="0.01" min="0" oninput="calculate()"></td>
+      <td><button class="btn-del" onclick="delRow(this)" title="Remove">×</button></td>
+    `;
+  } else {
+    tr.innerHTML = `
+      <td><input type="text"   value="${esc(data.desc ||'')}" placeholder="Description…" oninput="calculate()" style="text-align:left"></td>
+      <td><input type="number" value="${esc(data.amt  ||'')}" placeholder="0.00" step="0.01" min="0" oninput="calculate()"></td>
+      <td><button class="btn-del" onclick="delRow(this)" title="Remove">×</button></td>
+    `;
+  }
+  tbody.appendChild(tr);
+}
+
+function delRow(btn) { btn.closest('tr').remove(); calculate(); }
+
+// ── Main Calculate ───────────────────────────────────────────────────────
+function calculate() {
+  // Step 1
+  const amtFin = parse(document.getElementById('amtFinanced').value);
+  const nonApr = parse(document.getElementById('nonAprFees').value);
+  const tla    = Math.max(0, amtFin - nonApr);
+  document.getElementById('totalLoanAmt').textContent = fmt(tla);
+  document.getElementById('tlaDisp').textContent      = fmt(tla);
+
+  // Step 2
+  let allowable = 0, tierLabel = '—', rateLabel = '—', pillText = 'Enter a valid loan amount.';
+  if (tla > 0) {
+    const t   = getThreshold(tla);
+    allowable = t.fixed !== null ? t.fixed : tla * t.rate;
+    tierLabel = t.tier;
+    rateLabel = t.rateLabel + (t.rate ? ' of Total Loan Amount' : '');
+    pillText  = `<strong>${t.tier}:</strong> Allowable P&F = ${rateLabel}`;
+  }
+  document.getElementById('tierDisp').textContent         = tierLabel;
+  document.getElementById('rateDisp').textContent         = rateLabel;
+  document.getElementById('allowableDisp').textContent    = fmt(allowable);
+  document.getElementById('allowableSumDisp').textContent = fmt(allowable);
+  document.getElementById('thresholdPill').innerHTML      = 'ℹ️ ' + pillText;
+
+  // Step 3 – sum additions
+  let totalAdd = 0;
+  document.querySelectorAll('#addBody tr').forEach(tr => {
+    const inp = tr.querySelector('input[type="number"]');
+    if (inp) totalAdd += parse(inp.value);
+  });
+
+  // Step 3 – sum subtractions
+  let totalSub = 0;
+  document.querySelectorAll('#subBody tr').forEach(tr => {
+    const inp = tr.querySelector('input[type="number"]');
+    if (inp) totalSub += parse(inp.value);
+  });
+
+  const totalQM = totalAdd - totalSub;
+  document.getElementById('totalQMDisp').textContent = fmt(totalQM);
+
+  // Step 4 – result
+  const absDiff = Math.abs(totalQM - allowable);
+  const diffEl  = document.getElementById('diffDisp');
+  const diffLbl = document.getElementById('diffCardLabel');
+  const box     = document.getElementById('resultBox');
+  const icon    = document.getElementById('resultIcon');
+  const title   = document.getElementById('resultTitle');
+  const msg     = document.getElementById('resultMsg');
+
+  if (tla <= 0) {
+    box.className = 'result-box waiting';
+    icon.textContent  = '📋';
+    title.textContent = 'Awaiting Input';
+    msg.textContent   = 'Enter loan information and fee items to begin the QM test.';
+    diffLbl.textContent = 'Difference';
+    diffEl.textContent  = '$0.00';
+    diffEl.style.color  = '#1a3a6b';
+  } else if (totalQM > allowable) {
+    box.className = 'result-box failing';
+    icon.textContent  = '❌';
+    title.textContent = 'FAILS QM POINTS AND FEES TEST';
+    msg.textContent   = `This loan FAILS the QM Points and Fees Test by ${fmt(absDiff)}. `
+                      + `Total QM Points and Fees (${fmt(totalQM)}) exceeds the Allowable Points and Fees (${fmt(allowable)}).`;
+    diffLbl.textContent = 'Exceeds Allowable By';
+    diffEl.textContent  = fmt(absDiff);
+    diffEl.style.color  = '#b91c1c';
+  } else {
+    box.className = 'result-box passing';
+    icon.textContent  = '✅';
+    title.textContent = 'PASSES QM POINTS AND FEES TEST';
+    msg.textContent   = `This loan PASSES the QM Points and Fees Test. `
+                      + `Total QM Points and Fees (${fmt(totalQM)}) does not exceed the Allowable (${fmt(allowable)}). Margin: ${fmt(absDiff)}.`;
+    diffLbl.textContent = 'Under Allowable By';
+    diffEl.textContent  = fmt(absDiff);
+    diffEl.style.color  = '#15803d';
+  }
+}
+
+// ── Reset ────────────────────────────────────────────────────────────────
+function resetForm() {
+  if (!confirm('Reset all values? This cannot be undone.')) return;
+  ['amtFinanced','nonAprFees','borrowerName','loanNumber'].forEach(id => {
+    document.getElementById(id).value = (id === 'nonAprFees') ? '0' : '';
+  });
+  document.getElementById('addBody').innerHTML = '';
+  document.getElementById('subBody').innerHTML = '';
+  DEFAULT_ADDS.forEach(d => addFeeRow('add', d));
+  DEFAULT_SUBS.forEach(d => addFeeRow('sub', d));
+  calculate();
+}
+
+// ── Initialize ───────────────────────────────────────────────────────────
+DEFAULT_ADDS.forEach(d => addFeeRow('add', d));
+DEFAULT_SUBS.forEach(d => addFeeRow('sub', d));
+const today = new Date();
+document.getElementById('workDate').value =
+  String(today.getMonth()+1).padStart(2,'0') + '/' +
+  String(today.getDate()).padStart(2,'0') + '/' +
+  today.getFullYear();
+calculate();
+</script>
+</body>
+</html>
+```
